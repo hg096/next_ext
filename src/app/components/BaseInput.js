@@ -1,33 +1,35 @@
-// components/BaseInput.js
+"use client";
+
 import React from "react";
-import Label from "./Label";
-import Input from "./Inputs";
-import ValidationMessage from "./ValidationMessage";
 import { useFormContext } from "react-hook-form";
 
 export const BaseInput = ({
-  name,
-  label,
-  requiredMessage,
-  successMessage,
-  customSuccessMessage,
+  name = "",
+  label = "",
+  required_message = null,
+  success_message = null,
+  custom_success_message = null,
   type = "text",
-  placeholder,
-  minLength,
-  maxLength,
-  min,
-  max,
-  pattern,
-  patternMessage,
-  disabled,
-  value,
-  id,
-  validate = () => {},
+  placeholder = "",
+  minLength = null,
+  maxLength = null,
+  min = null,
+  max = null,
+  pattern = null,
+  pattern_message = null,
+  disabled = false,
+  value = undefined,
+  id = undefined,
+  validate = () => { },
 }) => {
-  const { formState } = useFormContext();
-  const { errors, isSubmitted } = formState;
+  const {
+    register,
+    formState: { errors, isSubmitted },
+  } = useFormContext();
 
   let patternVal;
+
+  // 패턴에 따른 정규식 설정
   switch (pattern) {
     case "ko":
       patternVal = /^[가-힣]+$/;
@@ -36,7 +38,7 @@ export const BaseInput = ({
       patternVal = /^[0-9]+$/;
       break;
     case "email":
-      patternVal = /([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)+$/;
+      patternVal = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       break;
     case "koEnNumSp":
       patternVal = /^[a-zA-Z가-힣0-9!@#$%^&*()-_+=<>?/,.:;{}|~`]+$/;
@@ -57,41 +59,47 @@ export const BaseInput = ({
       patternVal = /^[a-zA-Z]+$/;
       break;
     default:
-      break;
+      patternVal = null;
   }
 
-  let errorsMessage = errors[name]?.message;
+  const errorMessage = errors[name]?.message;
 
   return (
     <div className={type === "hidden" ? "hidden" : "w-full"}>
-      <div className="relative rounded mb-2 text-black w-full min-h-[48px]">
-        <Label htmlFor={id} text={label} />
-        <Input
-          name={name}
+      <div className="relative mb-2 w-full">
+        {label && (
+          <label htmlFor={id} className="block mb-2 text-gray-700">
+            {label}
+          </label>
+        )}
+        <input
           type={type}
-          placeholder={placeholder}
-          minLength={minLength}
-          maxLength={maxLength}
-          min={min}
-          max={max}
-          patternVal={patternVal}
-          patternMessage={patternMessage}
-          requiredMessage={requiredMessage}
-          validate={validate}
-          disabled={disabled}
-          value={value}
           id={id}
+          placeholder={placeholder}
+          disabled={disabled}
+          defaultValue={value}
+          {...register(name, {
+            required: required_message,
+            minLength: minLength ? { value: minLength, message: `${minLength}자 이상 입력해주세요` } : null,
+            maxLength: maxLength ? { value: maxLength, message: `${maxLength}자 이하 입력해주세요` } : null,
+            min: min ? { value: min, message: `${min} 이상 입력해주세요` } : null,
+            max: max ? { value: max, message: `${max} 이하 입력해주세요` } : null,
+            pattern: patternVal ? { value: patternVal, message: pattern_message } : null,
+            validate: validate,
+          })}
+          className={`w-full p-3 border rounded ${errors[name] ? "border-red-500" : isSubmitted && !errors[name] ? "border-green-500" : "border-gray-300"
+            } focus:outline-none focus:ring-2 focus:ring-purple-600`}
         />
+        {errors[name] && (
+          <p className="mt-2 text-sm text-red-500">{errorMessage}</p>
+        )}
+        {!errors[name] && isSubmitted && custom_success_message && (
+          <p className="mt-2 text-sm text-green-500">{custom_success_message}</p>
+        )}
+        {!errors[name] && isSubmitted && success_message && (
+          <p className="mt-2 text-sm text-green-500">{success_message}</p>
+        )}
       </div>
-      <ValidationMessage
-        message={
-          errorsMessage ||
-          (customSuccessMessage && !errors[name]
-            ? customSuccessMessage
-            : successMessage)
-        }
-        type={errors[name] ? "error" : "success"}
-      />
     </div>
   );
 };

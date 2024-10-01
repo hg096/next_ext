@@ -1,6 +1,8 @@
 
 import "@a/globals.css";
 import { Inter } from 'next/font/google';
+import { Sidebar } from "@a/components/Sidebar";
+
 
 const inter = Inter({
   subsets: ['latin'], // 필요한 문자 집합 설정
@@ -18,7 +20,16 @@ export default function AdmLayout({ children }) {
       <body
         className={`${inter.className} antialiased`}
       >
-        {children}
+        <div className="flex">
+          <div className="h-[100vh]">
+            <Sidebar></Sidebar>
+          </div>
+
+          <div className={`flex-1`}>
+            {children}
+          </div>
+        </div>
+
       </body>
     </html>
   );

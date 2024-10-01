@@ -1,0 +1,4 @@
+# NEXT_PUBLIC 접두사 필수
+# .env.local (로컬 개발 환경, .env.development와 병합되어 사용)
+
+NEXT_PUBLIC_API_BASE_URL=https://

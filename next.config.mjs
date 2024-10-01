@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 // next.config.mjs
+
+import fs from 'fs';
 import path from 'path';
+import dotenv from 'dotenv';
 
 const nextConfig = {
   webpack: (config) => {
