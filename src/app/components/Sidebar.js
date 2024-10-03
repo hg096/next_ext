@@ -4,10 +4,10 @@ import React, { useState, useEffect } from 'react';
 
 import Link from 'next/link';
 
-
+// md: 를 기준으로 모바일 pc 분리
 export const Sidebar = () => {
     // 사용자 상태를 관리하는 useState
-    const [user, setUser] = useState(null); // 사용자 정보
+    const [menu, setMenu] = useState(null); // 메뉴 정보
     const [loading, setLoading] = useState(true); // 로딩 상태
     const [error, setError] = useState(null); // 오류 상태
 
@@ -21,14 +21,18 @@ export const Sidebar = () => {
 
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/adm/menu/myMenu`);
 
-
             if (!response.ok) {
-                throw new Error('User data could not be fetched');
+                throw new Error('menu data could not be fetched');
             }
-            const data = await response.json();
-            console.log("menu: ", data)
 
-            setUser(data); // 사용자 정보 설정
+            const data = await response.json();
+
+            if (data?.status === "Y") {
+                console.log("menu: ", data);
+                console.log("menu.data: ", data.data);
+                setMenu(data.data); // 사용자 정보 설정
+            }
+
         } catch (error) {
             setError(error.message); // 에러 처리
         } finally {
@@ -68,13 +72,21 @@ export const Sidebar = () => {
                 <div className="text-2xl font-bold mb-4">My Sidebar</div>
                 <nav className="flex-1">
                     <ul>
-                        <li className="p-4 hover:bg-gray-700">
+                        {menu && menu?.map((item, index) => (
+
+                            <li key={index} className="p-4 my-1 rounded-lg hover:bg-gray-700 ">
+                                <Link href={`/`+item?.am_url}>{item?.am_name}</Link>
+                            </li>
+
+                        ))}
+
+                        <li className="p-4 my-1 rounded-lg hover:bg-gray-700 ">
                             <Link href="/">Home</Link>
                         </li>
-                        <li className="p-4 hover:bg-gray-700">
+                        <li className="p-4 my-1 rounded-lg hover:bg-gray-700 ">
                             <Link href="/about">About</Link>
                         </li>
-                        <li className="p-4 hover:bg-gray-700">
+                        <li className="p-4 my-1 rounded-lg hover:bg-gray-700 ">
                             <Link href="/contact">Contact</Link>
                         </li>
                     </ul>
@@ -90,8 +102,7 @@ export const Sidebar = () => {
             )}
 
             {/* 빈 공간을 추가하여 상단바가 다른 콘텐츠를 가리지 않도록 설정 */}
-            <div className="pt-16 md:pt-0"> {/* 4rem (16) 만큼 상단에 padding 추가 */}
-www
+            <div className="pt-16 md:pt-0">
             </div>
         </>
     );
