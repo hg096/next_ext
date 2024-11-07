@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 
 import Link from 'next/link';
+import Cookies from 'js-cookie';
+
 
 // md: 를 기준으로 모바일 pc 분리
 export const Sidebar = () => {
@@ -19,18 +21,22 @@ export const Sidebar = () => {
     const fetchUserData = async () => {
         try {
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/adm/menu/myMenu`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/adm/menu/myMenu`, {
+                method: 'GET',
+                credentials: 'include', // 쿠키 포함
+            });
 
             if (!response.ok) {
                 throw new Error('menu data could not be fetched');
             }
 
             const data = await response.json();
-
             if (data?.status === "Y") {
                 console.log("menu: ", data);
                 console.log("menu.data: ", data.data);
                 setMenu(data.data); // 사용자 정보 설정
+            } else {
+                console.log("!!menu: ", data);
             }
 
         } catch (error) {
@@ -43,6 +49,8 @@ export const Sidebar = () => {
     // 컴포넌트가 마운트될 때 API 호출
     useEffect(() => {
         fetchUserData();
+
+        // const _USER_LOGINSS = Cookies.get();
 
     }, []);
 
@@ -72,12 +80,12 @@ export const Sidebar = () => {
                 <div className="text-2xl font-bold mb-4">My Sidebar</div>
                 <nav className="flex-1">
                     <ul>
-                        {menu && menu?.map((item, index) => (
-
-                            <li key={index} className="p-4 my-1 rounded-lg hover:bg-gray-700 ">
-                                <Link href={`/`+item?.am_url}>{item?.am_name}</Link>
-                            </li>
-
+                        {menu && menu.map((item, index) => (
+                            item?.am_url && item?.am_name ? (
+                                <li key={index} className="p-4 my-1 rounded-lg hover:bg-gray-700">
+                                    <Link href={`/adm/` + item.am_url}>{item.am_name}</Link>
+                                </li>
+                            ) : null
                         ))}
 
                         <li className="p-4 my-1 rounded-lg hover:bg-gray-700 ">

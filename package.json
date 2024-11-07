@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node server.js",
+    "devS": "node server.js",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -13,7 +14,9 @@
     "ajv": "^8.17.1",
     "dotenv": "^16.4.5",
     "eslint": "^8.57.1",
+    "js-cookie": "^3.0.5",
     "next": "^14.2.13",
+    "nookies": "^2.5.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
